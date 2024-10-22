@@ -28,8 +28,8 @@ class _AccessTypeScreenState extends State<AccessTypeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.star, size: 60, color: Colors.black),
-              const SizedBox(height: 20),
+              Image.asset('image/assets/logo.jpeg', height: 250),
+              const SizedBox(height: 70),
               const Text(
                 'Tipo de acesso',
                 style: TextStyle(
