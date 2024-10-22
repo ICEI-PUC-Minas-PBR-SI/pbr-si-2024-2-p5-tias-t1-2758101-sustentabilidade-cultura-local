@@ -1,0 +1,1 @@
+ C:\\Users\\Lucas\\Downloads\\TIS-SUSTENTABILIDADE\\.dart_tool\\flutter_build\\a12a414c158c1db1ea4b696a2de3267d\\native_assets.yaml: 
