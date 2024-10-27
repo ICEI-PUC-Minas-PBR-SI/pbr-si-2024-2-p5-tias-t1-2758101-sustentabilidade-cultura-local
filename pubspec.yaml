@@ -10,17 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   sqflite: ^2.0.0
-  
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.6
-  firebase_core: ^3.6.0
-  cloud_firestore: ^5.4.4
-  firebase_auth: ^5.3.1
-
-  
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   firebase_core: ^3.6.0
   cloud_firestore: ^5.4.4
@@ -35,7 +24,7 @@ flutter:
   uses-material-design: true
   assets:
     - image/assets/logo.jpeg
-  #  - images/a_dot_ham.jpeg
+  # Uncomment and modify the following lines if you want to add custom fonts
   # fonts:
   #   - family: Schyler
   #     fonts:
