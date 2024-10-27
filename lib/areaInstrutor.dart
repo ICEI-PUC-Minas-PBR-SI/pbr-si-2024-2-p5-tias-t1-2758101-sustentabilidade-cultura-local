@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'perfilInstrutor.dart';
 class InstructorHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -24,15 +24,11 @@ class InstructorHomeScreen extends StatelessWidget {
               Container(
                 width: 200,
                 height: 200,
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color.fromARGB(255, 0, 0, 0), width: 2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
                 child: Center(
                   child: Icon(
-                    Icons.star_border,
+                    Icons.person,
                     size: 100,
-                    color: const Color.fromARGB(141, 29, 209, 5),
+                    color: const Color.fromARGB(255, 0, 0, 0),
                   ),
                 ),
               ),

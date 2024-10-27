@@ -4,10 +4,34 @@ import 'telaInicial.dart';
 import 'areaInstrutor.dart';
 import 'areaEstudante.dart';
 import 'login.instrutor.dart';
+import 'perfilInstrutor.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures all bindings are ready
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Corrige a chamada de método para incluir parênteses e o uso correto de chaves
+  
+  /*await FirebaseFirestore.instance
+      .collection("usuarios")
+      .doc("pontuação")
+      .set({"Roberto": 230});
+
+      */
+
   runApp(MyApp());
 }
+
+
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -21,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/loginInstructor': (context) => LoginInstrutor(),
         '/registroInstructor': (context) => Registroinstrutor(),
         '/student': (context) => StudentHomeScreen(),
+        '/perfilInstrutor': (context) => ProfessorProfilePage(),
       },
     );
   }

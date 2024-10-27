@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 class LoginInstrutor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -28,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void _login() {
+ /* void _login() {
     final email = _emailController.text;
     final password = _passwordController.text;
 
@@ -43,11 +41,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
+  */
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child: Center(
@@ -103,9 +102,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _login,
+                    onPressed: ()
+                    {
+                      
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -122,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
-                    // Ação de esqueci minha senha
+                    
                   },
                   child: const Text(
                     'Esqueci minha senha',
