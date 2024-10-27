@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class LoginInstrutor extends StatelessWidget {
   @override
@@ -26,22 +28,41 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
- /* void _login() {
-    final email = _emailController.text;
-    final password = _passwordController.text;
+  void _login() async {
+  final email = _emailController.text;
+  final password = _passwordController.text;
 
-    // Adicione sua lógica de login aqui
-    if (email == "test@example.com" && password == "password123") {
+  var db = FirebaseFirestore.instance;
+
+  // Busque o documento onde o email é igual ao informado
+  final emaiResult = await db.collection("Instrutor").where("email", isEqualTo: email).get();
+  
+  if (emaiResult.docs.isNotEmpty) {
+    // Obtenha o primeiro documento correspondente ao email
+    final userDoc = emaiResult.docs.first;
+    
+    // Extraia a senha armazenada no Firestore
+    final storedPassword = userDoc['senha']; // Substitua 'senha' pelo campo correto no Firestore
+
+    // Verifique se a senha informada corresponde à senha armazenada
+    if (storedPassword == password) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login bem-sucedido!')),
       );
+      // Adicione a lógica de navegação ou ações após o login bem-sucedido, como redirecionamento para uma nova página
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Credenciais inválidas.')),
+        SnackBar(content: Text('Senha incorreta.')),
       );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Email não encontrado.')),
+    );
   }
-  */
+}
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: ()
                     {
-                      
+                      _login();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 0, 0, 0),
@@ -119,16 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 18,
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextButton(
-                  onPressed: () {
-                    
-                  },
-                  child: const Text(
-                    'Esqueci minha senha',
-                    style: TextStyle(color: Colors.black54),
                   ),
                 ),
               ],
