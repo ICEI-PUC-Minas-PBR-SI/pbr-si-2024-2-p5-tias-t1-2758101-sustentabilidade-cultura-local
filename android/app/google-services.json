@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "932663043506",
+    "project_id": "suscult-39f00",
+    "storage_bucket": "suscult-39f00.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932663043506:android:f610a0b17428307f07f0ab",
+        "android_client_info": {
+          "package_name": "com.example.tis_sustentabilidade"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJOI4zjhyYri0U5zmDyvYHpw-UJVfJHoc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
