@@ -18,20 +18,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  // Corrige a chamada de método para incluir parênteses e o uso correto de chaves
-  
-  /*await FirebaseFirestore.instance
-      .collection("usuarios")
-      .doc("pontuação")
-      .set({"Roberto": 230});
-
-      */
-
   runApp(MyApp());
 }
-
-
 
 
 class MyApp extends StatelessWidget {

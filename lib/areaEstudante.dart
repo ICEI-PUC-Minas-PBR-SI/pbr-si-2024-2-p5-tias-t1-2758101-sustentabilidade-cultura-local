@@ -51,7 +51,7 @@ class StudentHomeScreen extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/perfilInstrutor');
+                    
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
