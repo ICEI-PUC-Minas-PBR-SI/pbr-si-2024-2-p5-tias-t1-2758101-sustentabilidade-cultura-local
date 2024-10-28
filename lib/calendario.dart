@@ -90,7 +90,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               _loadHorariosDisponiveis(selectedDay); // Carrega horários disponíveis
             },
           ),
-          const SizedBox(height: 5.0),
+          const SizedBox(height: 16.0),
           Expanded(
             child: ListView.builder(
               itemCount: horariosDisponiveis.length,
@@ -116,43 +116,22 @@ class _CalendarScreenState extends State<CalendarScreen> {
               },
             ),
           ),
+          if (_selectedHorario != null && !horariosReservados.contains(_selectedHorario))
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  await reservarAula(_selectedDay, _selectedHorario!, alunoId);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Horário $_selectedHorario reservado!')),
+                  );
+                  _loadHorariosDisponiveis(_selectedDay); // Atualiza horários após a reserva
+                },
+                child: Text('Confirmar Reserva para $_selectedHorario'),
+              ),
+            ),
         ],
       ),
-      bottomNavigationBar: _selectedHorario != null && !horariosReservados.contains(_selectedHorario)
-          ? BottomAppBar(
-              color: Colors.white,
-              elevation: 10,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 5,
-                  ),
-                  onPressed: () async {
-                    await reservarAula(_selectedDay, _selectedHorario!, alunoId);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Horário $_selectedHorario reservado!')),
-                    );
-                    _loadHorariosDisponiveis(_selectedDay); // Atualiza horários após a reserva
-                  },
-                  child: Center(
-                    child: Text(
-                      'Confirmar Reserva para ${_selectedHorario ?? 'Selecionar Horário'}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            )
-          : null,
     );
   }
 }

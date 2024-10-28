@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class LoginInstrutor extends StatelessWidget {
+class LoginAluno extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Busque o documento onde o email é igual ao informado
     final emailResult =
-        await db.collection("Instrutor").where("email", isEqualTo: email).get();
+        await db.collection("Alunos").where("email", isEqualTo: email).get();
 
     if (emailResult.docs.isNotEmpty) {
       // Obtenha o primeiro documento correspondente ao email
@@ -57,13 +57,6 @@ class _LoginScreenState extends State<LoginScreen> {
           SnackBar(content: Text('Login bem-sucedido!')),
         );
 
-        // Redirecionar para a página de perfil passando o instructorId
-        String instructorId = userDoc.id;
-        Navigator.pushNamed(
-          context,
-          '/perfilInstrutor',
-          arguments: instructorId, // Aqui você passa o ID
-        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Senha incorreta.')),
