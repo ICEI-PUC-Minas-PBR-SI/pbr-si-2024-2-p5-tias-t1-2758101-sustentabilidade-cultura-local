@@ -48,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (storedPassword == password) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login bem-sucedido!')),
+        
       );
       // Adicione a lógica de navegação ou ações após o login bem-sucedido, como redirecionamento para uma nova página
     } else {
@@ -126,6 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: ()
                     {
                       _login();
+                      Navigator.pushNamed(context, '/');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 0, 0, 0),
