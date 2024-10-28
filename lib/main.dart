@@ -20,15 +20,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Corrige a chamada de método para incluir parênteses e o uso correto de chaves
-
-  /*await FirebaseFirestore.instance
-      .collection("usuarios")
-      .doc("pontuação")
-      .set({"Roberto": 230});
-
-      */
-
   runApp(MyApp());
 }
 
@@ -47,7 +38,6 @@ class MyApp extends StatelessWidget {
         '/perfilInstrutor': (context) => ProfessorProfilePage(email: '',),
         '/registroAluno': (context) => RegistroAluno(),
         '/loginAluno' : (context) => LoginAluno(),
-        '/calendario': (context) => CalendarScreen(),
       },
     );
   }

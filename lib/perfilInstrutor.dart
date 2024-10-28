@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'calendario.dart';
+
 
 class ProfessorProfilePage extends StatefulWidget {
   final String email;
@@ -22,7 +24,10 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
   void getData(String email) async {
     var db = FirebaseFirestore.instance;
     try {
-      final ref = await db.collection("Instrutor").where("email", isEqualTo: email).get();
+      final ref = await db
+          .collection("Instrutor")
+          .where("email", isEqualTo: email)
+          .get();
       final docs = ref.docs;
 
       if (docs.isEmpty) {
@@ -41,6 +46,15 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
     }
   }
 
+  void mostrarCalendario() {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => CalendarScreen(instructorEmail: widget.email),
+    ),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,13 +70,16 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
               child: CircleAvatar(
                 radius: 50,
                 // Exemplo: use uma imagem de URL ou local aqui
-                backgroundImage: NetworkImage("URL_DA_IMAGEM"), // Substitua pela URL da imagem do professor
+                backgroundImage: NetworkImage(
+                    "URL_DA_IMAGEM"), // Substitua pela URL da imagem do professor
               ),
             ),
             SizedBox(height: 16),
             Center(
               child: Text(
-                recoveredData.isNotEmpty ? recoveredData.values.first['nome'] : 'Carregando...',
+                recoveredData.isNotEmpty
+                    ? recoveredData.values.first['nome']
+                    : 'Carregando...',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -72,7 +89,9 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
             SizedBox(height: 8),
             Center(
               child: Text(
-                recoveredData.isNotEmpty ? recoveredData.values.first['materia'] : 'Carregando...',
+                recoveredData.isNotEmpty
+                    ? recoveredData.values.first['materia']
+                    : 'Carregando...',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.grey[700],
@@ -99,27 +118,33 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
             ),
             SizedBox(height: 8),
             Text(
-              recoveredData.isNotEmpty ? recoveredData.values.first['biografia'] : 'Carregando...',
+              recoveredData.isNotEmpty
+                  ? recoveredData.values.first['biografia']
+                  : 'Carregando...',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.justify,
             ),
             SizedBox(height: 50),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/calendario');
-                },
-                child: Text('Entrar em contato'),
-                style: ElevatedButton.styleFrom(
-                  textStyle: TextStyle(
-                    fontSize: 18,
+            Padding(
+              padding: EdgeInsets.only(top: 50),
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Garante que a navegação está correta
+                    mostrarCalendario();
+                  },
+                  child: Text('Consulte a Agenda'),
+                  style: ElevatedButton.styleFrom(
+                    textStyle: TextStyle(
+                      fontSize: 18,
+                    ),
+                    backgroundColor: const Color.fromARGB(255, 87, 175, 76),
+                    padding: EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    foregroundColor: Colors.white,
                   ),
-                  backgroundColor: const Color.fromARGB(255, 87, 175, 76),
-                  padding: EdgeInsets.symmetric(horizontal: 100, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  foregroundColor: Colors.white,
                 ),
               ),
             ),
