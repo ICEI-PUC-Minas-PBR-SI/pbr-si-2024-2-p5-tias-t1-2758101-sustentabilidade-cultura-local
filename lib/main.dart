@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tis_sustentabilidade/homeAluno.dart';
 import 'package:tis_sustentabilidade/loginAluno.dart';
 import 'package:tis_sustentabilidade/registroInstrutor.dart';
 import 'telaInicial.dart';
@@ -6,8 +7,6 @@ import 'areaInstrutor.dart';
 import 'areaEstudante.dart';
 import 'login.instrutor.dart';
 import 'perfilInstrutor.dart';
-import 'calendario.dart';
-import 'loginAluno.dart';
 import 'registroAluno.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -38,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/perfilInstrutor': (context) => ProfessorProfilePage(email: '',),
         '/registroAluno': (context) => RegistroAluno(),
         '/loginAluno' : (context) => LoginAluno(),
+        '/homeAluno': (context) => HomeAluno(email: '',),
       },
     );
   }
