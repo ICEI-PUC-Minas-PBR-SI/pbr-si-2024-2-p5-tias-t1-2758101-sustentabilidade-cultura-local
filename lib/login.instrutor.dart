@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'perfilInstrutor.dart';
 
 
 class LoginInstrutor extends StatelessWidget {
@@ -38,19 +39,21 @@ class _LoginScreenState extends State<LoginScreen> {
   final emaiResult = await db.collection("Instrutor").where("email", isEqualTo: email).get();
   
   if (emaiResult.docs.isNotEmpty) {
-    // Obtenha o primeiro documento correspondente ao email
     final userDoc = emaiResult.docs.first;
-    
-    // Extraia a senha armazenada no Firestore
     final storedPassword = userDoc['senha']; // Substitua 'senha' pelo campo correto no Firestore
 
-    // Verifique se a senha informada corresponde à senha armazenada
     if (storedPassword == password) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login bem-sucedido!')),
-        
       );
-      // Adicione a lógica de navegação ou ações após o login bem-sucedido, como redirecionamento para uma nova página
+
+      // Navegar para a tela de perfil com o email
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfessorProfilePage(email: email),
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Senha incorreta.')),

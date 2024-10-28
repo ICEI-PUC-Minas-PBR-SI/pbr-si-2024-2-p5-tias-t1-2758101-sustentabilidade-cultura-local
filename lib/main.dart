@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         '/loginInstructor': (context) => LoginInstrutor(),
         '/registroInstructor': (context) => Registroinstrutor(),
         '/student': (context) => StudentHomeScreen(),
-        '/perfilInstrutor': (context) => ProfessorProfilePage(),
+        '/perfilInstrutor': (context) => ProfessorProfilePage(email: '',),
         '/calendario': (context) => CalendarScreen(),
       },
     );
