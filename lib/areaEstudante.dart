@@ -51,7 +51,7 @@ class StudentHomeScreen extends StatelessWidget {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    
+                    Navigator.pushNamed(context, '/loginAluno');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
@@ -74,7 +74,7 @@ class StudentHomeScreen extends StatelessWidget {
                 height: 50,
                 child: OutlinedButton(
                   onPressed: () {
-                    // Ação de registro
+                     Navigator.pushNamed(context, '/registroAluno');
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.black),

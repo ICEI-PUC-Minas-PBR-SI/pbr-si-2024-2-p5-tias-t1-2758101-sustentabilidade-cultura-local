@@ -1,25 +1,28 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'perfilInstrutor.dart';
+import 'package:flutter/material.dart';
 
-class LoginInstrutor extends StatelessWidget {
+class RegistroAluno extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: RegisterScreen(),
     );
   }
 }
 
-class LoginScreen extends StatefulWidget {
+class RegisterScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _idadeController = TextEditingController();
+  final _telefoneController = TextEditingController();
+
   bool _obscureText = true;
 
   void _togglePasswordVisibility() {
@@ -28,55 +31,50 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void _login() async {
-    final email = _emailController.text.trim();
+  void _register() async {
+    final name = _nameController.text;
+    final email = _emailController.text;
     final password = _passwordController.text;
+    final idade = _idadeController.text;
+    final telefone = _telefoneController.text;
 
-    // Verifica se os campos estão vazios
-    if (email.isEmpty || password.isEmpty) {
+    if (name.isEmpty || email.isEmpty || password.isEmpty || idade.isEmpty || telefone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor, preencha todos os campos.')),
       );
       return;
     }
 
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
+
     try {
       var db = FirebaseFirestore.instance;
+      await db.collection("Alunos").add({
+        "nome": name,
+        "email": email,
+        "senha": password,
+        "idade": idade,
+        "telefone": telefone,
+      });
 
-      // Busque o documento onde o email é igual ao informado
-      final emailResult = await db.collection("Instrutor").where("email", isEqualTo: email).get();
-
-      if (emailResult.docs.isNotEmpty) {
-        final userDoc = emailResult.docs.first;
-        final storedPassword = userDoc['senha']; // Certifique-se de que o campo 'senha' existe
-
-        // Verifique se a senha informada corresponde à senha armazenada
-        if (storedPassword == password) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Login bem-sucedido!')),
-          );
-
-          // Navegar para a tela de perfil com o email
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProfessorProfilePage(email: email),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Senha incorreta.')),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Email não encontrado.')),
-        );
-      }
-    } catch (e) {
-      print("Erro ao fazer login: $e");
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao fazer login.')),
+        SnackBar(content: Text('Registro bem-sucedido!')),
+      );
+
+      _nameController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _idadeController.clear();
+      _telefoneController.clear();
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao registrar: $e')),
       );
     }
   }
@@ -84,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child: Center(
@@ -93,19 +91,30 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
-                  Icons.lock,
+                  Icons.person_add,
                   size: 100,
                   color: Colors.black,
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Login',
+                  'Registrar-se como Aluno',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 40),
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nome',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -115,6 +124,29 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     prefixIcon: Icon(Icons.email),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _idadeController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Idade',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: Icon(Icons.cake),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _telefoneController,
+                  decoration: InputDecoration(
+                    labelText: 'Telefone',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: Icon(Icons.phone),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -140,15 +172,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _login,
+                    onPressed: _register,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+                      backgroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: const Text(
-                      'Entrar',
+                      'Registrar',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
