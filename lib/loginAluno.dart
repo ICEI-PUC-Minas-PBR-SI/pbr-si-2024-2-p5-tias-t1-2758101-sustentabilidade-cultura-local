@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'homeAluno.dart';
 
 class LoginAluno extends StatelessWidget {
+  const LoginAluno({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -12,6 +15,8 @@ class LoginAluno extends StatelessWidget {
 }
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -33,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor, preencha todos os campos.')),
+        const SnackBar(content: Text('Por favor, preencha todos os campos.')),
       );
       return;
     }
@@ -54,17 +59,23 @@ class _LoginScreenState extends State<LoginScreen> {
       // Verifique se a senha informada corresponde à senha armazenada
       if (storedPassword == password) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login bem-sucedido!')),
+          const SnackBar(content: Text('Login bem-sucedido!')),
         );
-
+       // Navegar para a tela de perfil com o email
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeAluno(email: email),
+            ),
+          );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Senha incorreta.')),
+          const SnackBar(content: Text('Senha incorreta.')),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Email não encontrado.')),
+        const SnackBar(content: Text('Email não encontrado.')),
       );
     }
   }
@@ -102,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    prefixIcon: Icon(Icons.email),
+                    prefixIcon: const Icon(Icons.email),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -114,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    prefixIcon: Icon(Icons.lock),
+                    prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureText ? Icons.visibility : Icons.visibility_off,
