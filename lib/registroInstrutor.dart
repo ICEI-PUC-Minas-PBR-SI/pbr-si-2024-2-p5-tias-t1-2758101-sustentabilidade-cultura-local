@@ -23,7 +23,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _biografiaController = TextEditingController();
   final _telefoneController = TextEditingController();
   final _precoHoraController = TextEditingController();
-  final _materiaController = TextEditingController();
+  
+  final List<String> _materias = ['Matemática', 'Inglês', 'Português', 'Violão'];
+  String? _selectedMateria;
+
   bool _obscureText = true;
 
   void _togglePasswordVisibility() {
@@ -32,73 +35,60 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
- void _register() async {
-  final name = _nameController.text;
-  final email = _emailController.text;
-  final password = _passwordController.text;
-  final biografia = _biografiaController.text;
-  final telefone = _telefoneController.text;
-  final precoHora = _precoHoraController.text;
-  final materia = _materiaController.text;
+  void _register() async {
+    final name = _nameController.text;
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final biografia = _biografiaController.text;
+    final telefone = _telefoneController.text;
+    final precoHora = _precoHoraController.text;
+    final materia = _selectedMateria;
 
-  if (name.isEmpty ||
-      email.isEmpty ||
-      password.isEmpty ||
-      biografia.isEmpty ||
-      telefone.isEmpty ||
-      precoHora.isEmpty ||
-      materia.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Por favor, preencha todos os campos.')),
+    if (name.isEmpty || email.isEmpty || password.isEmpty || biografia.isEmpty ||
+        telefone.isEmpty || precoHora.isEmpty || materia == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Por favor, preencha todos os campos.')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
     );
-    return;
+
+    try {
+      var db = FirebaseFirestore.instance;
+      await db.collection("Instrutor").add({
+        "nome": name,
+        "email": email,
+        "senha": password,
+        "biografia": biografia,
+        "telefone": telefone,
+        "precoHora": precoHora,
+        "materia": materia,
+      });
+
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registro bem-sucedido!')),
+      );
+
+      _nameController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _biografiaController.clear();
+      _telefoneController.clear();
+      _precoHoraController.clear();
+      _selectedMateria = null;
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao registrar: $e')),
+      );
+    }
   }
-
-  // Mostra o indicador de carregamento
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => Center(child: CircularProgressIndicator()),
-  );
-
-  try {
-    print("Conectando ao Firestore...");
-    var db = FirebaseFirestore.instance;
-    await db.collection("Instrutor").add({
-      "nome": name,
-      "email": email,
-      "senha": password,
-      "biografia": biografia,
-      "telefone": telefone,
-      "precoHora": precoHora,
-      "materia": materia,
-    });
-    print("Registro bem-sucedido!");
-
-    Navigator.pop(context); // Oculta o indicador de carregamento
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Registro bem-sucedido!')),
-    );
-
-    // Limpa os campos do formulário
-    _nameController.clear();
-    _emailController.clear();
-    _passwordController.clear();
-    _biografiaController.clear();
-    _telefoneController.clear();
-    _precoHoraController.clear();
-    _materiaController.clear();
-  } catch (e) {
-    Navigator.pop(context); // Oculta o indicador de carregamento em caso de erro
-    print("Erro ao registrar: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao registrar: $e')),
-    );
-  }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -155,25 +145,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    prefixIcon: Icon(Icons.description),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _materiaController,
-                  decoration: InputDecoration(
-                    labelText: 'Matéria/Aula que irá lecionar ',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    prefixIcon: Icon(Icons.school),
+                    prefixIcon: Icon(Icons.info),
                   ),
                 ),
                 const SizedBox(height: 20),
                 TextField(
                   controller: _telefoneController,
-                  keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     labelText: 'Telefone',
                     border: OutlineInputBorder(
@@ -183,17 +160,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextField(
-                  controller: _precoHoraController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                DropdownButtonFormField<String>(
+                  value: _selectedMateria,
+                  items: _materias.map((materia) {
+                    return DropdownMenuItem<String>(
+                      value: materia,
+                      child: Text(materia),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedMateria = newValue;
+                    });
+                  },
                   decoration: InputDecoration(
-                    labelText: 'Preço por Hora',
-                    hintText: 'Ex: 50,00',
+                    labelText: 'Matéria',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    prefixIcon: Icon(
-                        Icons.attach_money), // Better icon for monetary values
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _precoHoraController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Preço/Hora',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: Icon(Icons.money),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -229,7 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: const Text(
                       'Registrar',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 255, 255, 255),
+                        color: Colors.white,
                         fontSize: 18,
                       ),
                     ),

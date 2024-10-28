@@ -1,14 +1,45 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class ProfessorProfilePage extends StatelessWidget {
-  // Lista de horários disponíveis
-  final List<String> horariosDisponiveis = [
-    'Segunda-feira: 10:00 - 12:00',
-    'Terça-feira: 14:00 - 16:00',
-    'Quarta-feira: 08:00 - 10:00',
-    'Quinta-feira: 18:00 - 20:00',
-    'Sexta-feira: 16:00 - 18:00',
-  ];
+class ProfessorProfilePage extends StatefulWidget {
+  final String email;
+
+  ProfessorProfilePage({required this.email});
+
+  @override
+  _ProfessorProfilePageState createState() => _ProfessorProfilePageState();
+}
+
+class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
+  Map<String, dynamic> recoveredData = {};
+
+  @override
+  void initState() {
+    super.initState();
+    getData(widget.email);
+  }
+
+  void getData(String email) async {
+    var db = FirebaseFirestore.instance;
+    try {
+      final ref = await db.collection("Instrutor").where("email", isEqualTo: email).get();
+      final docs = ref.docs;
+
+      if (docs.isEmpty) {
+        print("Nenhum Instrutor encontrado.");
+        return;
+      }
+
+      setState(() {
+        recoveredData = {};
+        for (var doc in docs) {
+          recoveredData[doc.id] = doc.data();
+        }
+      });
+    } catch (e) {
+      print("Erro ao recuperar dados: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,22 +48,21 @@ class ProfessorProfilePage extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage(
-                  'https://www.example.com/professor-image.jpg',
-                ),
+                // Exemplo: use uma imagem de URL ou local aqui
+                backgroundImage: NetworkImage("URL_DA_IMAGEM"), // Substitua pela URL da imagem do professor
               ),
             ),
             SizedBox(height: 16),
             Center(
               child: Text(
-                'Prof. João Silva',
+                recoveredData.isNotEmpty ? recoveredData.values.first['nome'] : 'Carregando...',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -42,7 +72,7 @@ class ProfessorProfilePage extends StatelessWidget {
             SizedBox(height: 8),
             Center(
               child: Text(
-                'Matemática, Física',
+                recoveredData.isNotEmpty ? recoveredData.values.first['materia'] : 'Carregando...',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.grey[700],
@@ -51,23 +81,8 @@ class ProfessorProfilePage extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.star, color: Colors.amber, size: 24),
-                  Icon(Icons.star, color: Colors.amber, size: 24),
-                  Icon(Icons.star, color: Colors.amber, size: 24),
-                  Icon(Icons.star, color: Colors.amber, size: 24),
-                  Icon(Icons.star_half, color: Colors.amber, size: 24),
-                  SizedBox(width: 8),
-                  Text('4.5', style: TextStyle(fontSize: 18)),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-            Center(
               child: Text(
-                'Preço por hora: R\$ 50,00',
+                'Preço por hora: R\$ ${recoveredData.isNotEmpty ? recoveredData.values.first['precoHora'] : 'Carregando...'}',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.blueAccent,
@@ -84,55 +99,27 @@ class ProfessorProfilePage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'Sou professor de Matemática e Física com 10 anos de experiência. '
-              'Adoro ajudar alunos a entender conceitos difíceis de forma simples e prática.',
+              recoveredData.isNotEmpty ? recoveredData.values.first['biografia'] : 'Carregando...',
               style: TextStyle(fontSize: 16),
               textAlign: TextAlign.justify,
             ),
-            SizedBox(height: 16),
-            Text(
-              'Horários disponíveis:',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            // Lista de horários disponíveis
-            Expanded(
-              child: ListView.builder(
-                itemCount: horariosDisponiveis.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: Icon(Icons.schedule, color: Colors.blueAccent),
-                    title: Text(
-                      horariosDisponiveis[index],
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 16),
+            SizedBox(height: 50),
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Ação ao clicar no botão
+                  Navigator.pushNamed(context, '/calendario');
                 },
                 child: Text('Entrar em contato'),
                 style: ElevatedButton.styleFrom(
                   textStyle: TextStyle(
-                    fontSize: 18, // Definindo o tamanho da fonte
+                    fontSize: 18,
                   ),
-                  backgroundColor: const Color.fromARGB(255, 87, 175, 76), // Cor de fundo
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 100, vertical: 15), // Tamanho do botão
+                  backgroundColor: const Color.fromARGB(255, 87, 175, 76),
+                  padding: EdgeInsets.symmetric(horizontal: 100, vertical: 15),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(30), // Bordas arredondadas
+                    borderRadius: BorderRadius.circular(30),
                   ),
-                  foregroundColor:
-                      Colors.white, // Cor do texto (substituto do 'textColor')
+                  foregroundColor: Colors.white,
                 ),
               ),
             ),

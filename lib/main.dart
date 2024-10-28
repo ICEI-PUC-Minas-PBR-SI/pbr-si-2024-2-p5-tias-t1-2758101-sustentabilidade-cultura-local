@@ -44,11 +44,7 @@ class MyApp extends StatelessWidget {
         '/loginInstructor': (context) => LoginInstrutor(),
         '/registroInstructor': (context) => Registroinstrutor(),
         '/student': (context) => StudentHomeScreen(),
-        /*'/perfilInstrutor': (context) {
-          final instructorId =
-              ModalRoute.of(context)!.settings.arguments as String;
-          return ProfessorProfilePage(instructorId: instructorId);
-        },*/
+        '/perfilInstrutor': (context) => ProfessorProfilePage(email: '',),
         '/registroAluno': (context) => RegistroAluno(),
         '/loginAluno' : (context) => LoginAluno(),
         '/calendario': (context) => CalendarScreen(),

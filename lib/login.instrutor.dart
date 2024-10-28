@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'perfilInstrutor.dart';
 
 class LoginInstrutor extends StatelessWidget {
   @override
@@ -28,9 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() async {
-    final email = _emailController.text;
+    final email = _emailController.text.trim();
     final password = _passwordController.text;
 
+    // Verifica se os campos estão vazios
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor, preencha todos os campos.')),
@@ -38,40 +40,43 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    var db = FirebaseFirestore.instance;
+    try {
+      var db = FirebaseFirestore.instance;
 
-    // Busque o documento onde o email é igual ao informado
-    final emailResult =
-        await db.collection("Instrutor").where("email", isEqualTo: email).get();
+      // Busque o documento onde o email é igual ao informado
+      final emailResult = await db.collection("Instrutor").where("email", isEqualTo: email).get();
 
-    if (emailResult.docs.isNotEmpty) {
-      // Obtenha o primeiro documento correspondente ao email
-      final userDoc = emailResult.docs.first;
+      if (emailResult.docs.isNotEmpty) {
+        final userDoc = emailResult.docs.first;
+        final storedPassword = userDoc['senha']; // Certifique-se de que o campo 'senha' existe
 
-      // Extraia a senha armazenada no Firestore
-      final storedPassword = userDoc['senha'];
+        // Verifique se a senha informada corresponde à senha armazenada
+        if (storedPassword == password) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login bem-sucedido!')),
+          );
 
-      // Verifique se a senha informada corresponde à senha armazenada
-      if (storedPassword == password) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login bem-sucedido!')),
-        );
-
-        // Redirecionar para a página de perfil passando o instructorId
-        String instructorId = userDoc.id;
-        Navigator.pushNamed(
-          context,
-          '/perfilInstrutor',
-          arguments: instructorId, // Aqui você passa o ID
-        );
+          // Navegar para a tela de perfil com o email
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfessorProfilePage(email: email),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Senha incorreta.')),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Senha incorreta.')),
+          SnackBar(content: Text('Email não encontrado.')),
         );
       }
-    } else {
+    } catch (e) {
+      print("Erro ao fazer login: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Email não encontrado.')),
+        SnackBar(content: Text('Erro ao fazer login.')),
       );
     }
   }
