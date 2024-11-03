@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'calendario.dart';
-
+import 'package:tis_sustentabilidade/editar_horarios.dart';
 
 class ProfessorProfilePage extends StatefulWidget {
   final String email;
@@ -46,14 +45,14 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
     }
   }
 
-  void mostrarCalendario() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => CalendarScreen(instructorEmail: widget.email),
-    ),
-  );
-}
+  void EditaHorarios() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditarHorariosScreen(instructorEmail: widget.email), // Corrigido para usar widget.email
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +68,6 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
             Center(
               child: CircleAvatar(
                 radius: 50,
-                // Exemplo: use uma imagem de URL ou local aqui
                 backgroundImage: NetworkImage(
                     "URL_DA_IMAGEM"), // Substitua pela URL da imagem do professor
               ),
@@ -129,11 +127,8 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
               padding: EdgeInsets.only(top: 50),
               child: Center(
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Garante que a navegação está correta
-                    mostrarCalendario();
-                  },
-                  child: Text('Consulte a Agenda'),
+                  onPressed: EditaHorarios, // Garante que a navegação está correta
+                  child: Text('Edite sua Agenda'),
                   style: ElevatedButton.styleFrom(
                     textStyle: TextStyle(
                       fontSize: 18,
