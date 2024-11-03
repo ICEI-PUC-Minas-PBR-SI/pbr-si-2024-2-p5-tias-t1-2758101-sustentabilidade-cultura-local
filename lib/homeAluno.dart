@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'calendario.dart';  // Assegure-se de que este arquivo existe
+import 'calendario.dart';
 import 'perfilInstrutor.dart';
-import 'PerfilInstrutorParaAluno.dart'; // Certifique-se de que você está importando a página correta
+import 'PerfilInstrutorParaAluno.dart';
 
 class HomeAluno extends StatefulWidget {
   final String email;
@@ -17,6 +17,7 @@ class _HomeAlunoState extends State<HomeAluno> {
   List<Map<String, dynamic>> _professores = [];
   List<Map<String, dynamic>> _filteredProfessores = [];
   String? _selectedMateria;
+  double _precoMaximo = 100; // Defina o valor máximo desejado para o preço
 
   @override
   void initState() {
@@ -28,7 +29,7 @@ class _HomeAlunoState extends State<HomeAluno> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ProfessorProfilePageStudent(email: professorEmail), // Corrigido para chamar o construtor corretamente
+        builder: (_) => ProfessorProfilePageStudent(email: professorEmail),
       ),
     );
   }
@@ -52,8 +53,13 @@ class _HomeAlunoState extends State<HomeAluno> {
       _filteredProfessores = _professores.where((professor) {
         final nome = professor['nome'].toLowerCase();
         final materia = professor['materia']?.toLowerCase() ?? '';
-        return (nome.contains(searchQuery) || materia.contains(searchQuery)) &&
-               (materia == _selectedMateria || _selectedMateria == null);
+        final preco = double.tryParse(professor['precoHora'].toString()) ?? 0;
+
+        bool matchesSearchQuery = searchQuery.isEmpty || nome.contains(searchQuery);
+        bool matchesMateria = _selectedMateria == null || materia == _selectedMateria?.toLowerCase();
+        bool matchesPreco = preco <= _precoMaximo;
+
+        return matchesSearchQuery && matchesMateria && matchesPreco;
       }).toList();
     });
   }
@@ -70,15 +76,34 @@ class _HomeAlunoState extends State<HomeAluno> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: 'Buscar Professores',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: (value) {
+            Autocomplete<String>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text.isEmpty) {
+                  return const Iterable<String>.empty();
+                }
+                return _professores
+                    .map((prof) => prof['nome'].toString())
+                    .where((nome) => nome.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+              },
+              onSelected: (String selection) {
+                _searchController.text = selection;
                 _filterProfessores();
+              },
+              fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController,
+                  FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
+                _searchController.text = fieldTextEditingController.text;
+                return TextField(
+                  controller: fieldTextEditingController,
+                  focusNode: fieldFocusNode,
+                  decoration: const InputDecoration(
+                    labelText: 'Buscar Professores',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                  onChanged: (value) {
+                    _filterProfessores();
+                  },
+                );
               },
             ),
             const SizedBox(height: 20),
@@ -102,6 +127,25 @@ class _HomeAlunoState extends State<HomeAluno> {
               ),
             ),
             const SizedBox(height: 20),
+            Column(
+              children: [
+                Text("Filtrar por faixa de preço"),
+                Slider(
+                  value: _precoMaximo,
+                  min: 0,
+                  max: 500,
+                  divisions: 50,
+                  label: 'R\$ ${_precoMaximo.toStringAsFixed(0)}',
+                  onChanged: (value) {
+                    setState(() {
+                      _precoMaximo = value;
+                      _filterProfessores();
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: _filteredProfessores.length,
@@ -111,7 +155,7 @@ class _HomeAlunoState extends State<HomeAluno> {
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
                       title: Text(professor['nome']),
-                      subtitle: Text('Matéria: ${professor['materia']}'),
+                      subtitle: Text('Matéria: ${professor['materia']}\nPreço por hora: R\$ ${professor['precoHora']}'),
                       trailing: const Icon(Icons.arrow_forward),
                       onTap: () {
                         perfilInstrutor(professor['email']);
