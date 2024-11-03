@@ -27,57 +27,65 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _loadHorariosDisponiveis(_selectedDay);
   }
 
-  // Função para gerar horários
-  List<String> generateHorarios(int startHour, int endHour) {
-    List<String> horarios = [];
-    for (int hour = startHour; hour <= endHour; hour++) {
-      horarios.add('${hour.toString().padLeft(2, '0')}:00');
-    }
-    return horarios;
-  }
-
   Future<void> _loadHorariosDisponiveis(DateTime selectedDay) async {
+    // Limpa horários e redefine o horário selecionado
     setState(() {
-      horariosDisponiveis =
-          generateHorarios(8, 18); // Gera horários de 08:00 a 18:00
-      _selectedHorario = null; // Limpa o horário selecionado quando o dia muda
+      horariosDisponiveis = [];
+      _selectedHorario = null;
     });
+
+    // Obtenha os horários salvos do instrutor para o dia selecionado
+    final docRef = FirebaseFirestore.instance
+        .collection('Instrutor')
+        .doc(widget.instructorEmail);
+
+    final snapshot = await docRef.get();
+
+    if (snapshot.exists && snapshot.data()!['horarios'] != null) {
+      final horariosDoDia = snapshot.data()!['horarios'][DateFormat('yyyy-MM-dd').format(selectedDay)];
+      
+      if (horariosDoDia != null) {
+        setState(() {
+          horariosDisponiveis = List<String>.from(
+              horariosDoDia.map((horario) => '${horario['inicio']} - ${horario['termino']}'));
+        });
+      }
+    }
 
     // Obtenha os horários reservados
     await getHorariosReservados(selectedDay, widget.instructorEmail);
   }
 
   Future<void> getHorariosReservados(DateTime data, String instructorEmail) async {
-  final docRef = FirebaseFirestore.instance
-      .collection('AgendaAulas') // Coleção de instrutores
-      .doc(instructorEmail) // Documento específico do instrutor
-      .collection('aulas') // Subcoleção para as aulas desse instrutor
-      .doc(DateFormat('yyyy-MM-dd').format(data)); // Documento específico para a data
+    final docRef = FirebaseFirestore.instance
+        .collection('AgendaAulas') // Coleção de instrutores
+        .doc(instructorEmail) // Documento específico do instrutor
+        .collection('aulas') // Subcoleção para as aulas desse instrutor
+        .doc(DateFormat('yyyy-MM-dd').format(data)); // Documento específico para a data
 
-  final snapshot = await docRef.get();
+    final snapshot = await docRef.get();
 
-  if (snapshot.exists) {
-    setState(() {
-      horariosReservados = List<String>.from(snapshot['horariosReservados']);
-    });
-  } else {
-    horariosReservados = [];
+    if (snapshot.exists) {
+      setState(() {
+        horariosReservados = List<String>.from(snapshot['horariosReservados']);
+      });
+    } else {
+      horariosReservados = [];
+    }
   }
-}
 
-Future<void> reservarAula(DateTime data, String horario, String alunoId) async {
-  final docRef = FirebaseFirestore.instance
-      .collection('AgendaAulas') // Coleção de instrutores
-      .doc(widget.instructorEmail) // Documento específico do instrutor
-      .collection('aulas') // Subcoleção para as aulas desse instrutor
-      .doc(DateFormat('yyyy-MM-dd').format(data)); // Documento específico para a data
+  Future<void> reservarAula(DateTime data, String horario, String alunoId) async {
+    final docRef = FirebaseFirestore.instance
+        .collection('AgendaAulas') // Coleção de instrutores
+        .doc(widget.instructorEmail) // Documento específico do instrutor
+        .collection('aulas') // Subcoleção para as aulas desse instrutor
+        .doc(DateFormat('yyyy-MM-dd').format(data)); // Documento específico para a data
 
-  await docRef.set({
-    'horariosReservados': FieldValue.arrayUnion([horario]),
-    'alunoId': alunoId,
-  }, SetOptions(merge: true)); // Usa `merge` para atualizar o documento existente
-}
-
+    await docRef.set({
+      'horariosReservados': FieldValue.arrayUnion([horario]),
+      'alunoId': alunoId,
+    }, SetOptions(merge: true)); // Usa `merge` para atualizar o documento existente
+  }
 
   @override
   Widget build(BuildContext context) {

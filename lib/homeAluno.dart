@@ -1,8 +1,8 @@
-// telaInicialAluno.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'calendario.dart';
+import 'calendario.dart';  // Assegure-se de que este arquivo existe
+import 'perfilInstrutor.dart';
+import 'PerfilInstrutorParaAluno.dart'; // Certifique-se de que você está importando a página correta
 
 class HomeAluno extends StatefulWidget {
   final String email;
@@ -24,13 +24,22 @@ class _HomeAlunoState extends State<HomeAluno> {
     _fetchProfessores();
   }
 
+  void perfilInstrutor(String professorEmail) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProfessorProfilePageStudent(email: professorEmail), // Corrigido para chamar o construtor corretamente
+      ),
+    );
+  }
+
   Future<void> _fetchProfessores() async {
     try {
       var db = FirebaseFirestore.instance;
       var snapshot = await db.collection("Instrutor").get();
       setState(() {
-        _professores = snapshot.docs.map((doc) => doc.data()).toList();
-        _filteredProfessores = List.from(_professores); // Inicializa a lista filtrada com todos os professores
+        _professores = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+        _filteredProfessores = List.from(_professores);
       });
     } catch (e) {
       print("Erro ao buscar professores: $e");
@@ -84,7 +93,7 @@ class _HomeAlunoState extends State<HomeAluno> {
               onChanged: (newValue) {
                 setState(() {
                   _selectedMateria = newValue;
-                  _filterProfessores(); // Filtra professores ao mudar a matéria
+                  _filterProfessores();
                 });
               },
               decoration: const InputDecoration(
@@ -105,8 +114,7 @@ class _HomeAlunoState extends State<HomeAluno> {
                       subtitle: Text('Matéria: ${professor['materia']}'),
                       trailing: const Icon(Icons.arrow_forward),
                       onTap: () {
-                        // Navegar para a tela de perfil do professor
-                        Navigator.pushNamed(context, '/perfilInstrutor', arguments: professor['email']);
+                        perfilInstrutor(professor['email']);
                       },
                     ),
                   );

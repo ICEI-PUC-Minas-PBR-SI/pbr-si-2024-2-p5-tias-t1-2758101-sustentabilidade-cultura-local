@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tis_sustentabilidade/PerfilInstrutorParaAluno.dart';
 import 'package:tis_sustentabilidade/calendario.dart';
 import 'package:tis_sustentabilidade/homeAluno.dart';
 import 'package:tis_sustentabilidade/loginAluno.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/registroInstructor': (context) => Registroinstrutor(),
         '/student': (context) => StudentHomeScreen(),
         '/perfilInstrutor': (context) => ProfessorProfilePage(email: '',),
+        '/perfilInstrutorStudant': (context) => ProfessorProfilePageStudent(email: '',),
         '/registroAluno': (context) => RegistroAluno(),
         '/loginAluno' : (context) => LoginAluno(),
         '/homeAluno': (context) => HomeAluno(email: '',),
