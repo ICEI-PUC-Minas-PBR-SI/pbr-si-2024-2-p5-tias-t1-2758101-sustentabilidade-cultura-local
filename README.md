@@ -1,5 +1,7 @@
 # SUSTENTABILIDADE E CULTURA LOCAL
 
+Link para documento em word: https://sgapucminasbr-my.sharepoint.com/personal/1399713_sga_pucminas_br/_layouts/15/guestaccess.aspx?share=EeJovN7ERQFCkjtNg4iF7m4BUmJFjKPGj_4uIFKnfZZVbw&e=syXACf
+
 ### Introdução 
 
 Nos dias atuais, a busca por desenvolvimento pessoal e profissional tem se tornado cada vez mais essencial. Com a crescente demanda por educação complementar e atividades culturais, a necessidade de plataformas eficientes que conectem usuários a oportunidades de aprendizado nunca foi tão grande. Nesse contexto, a criação de um aplicativo que facilite a marcação de aulas de música, dança(e outros) e reforço escolar surge como uma solução inovadora para atender a essas necessidades. 
