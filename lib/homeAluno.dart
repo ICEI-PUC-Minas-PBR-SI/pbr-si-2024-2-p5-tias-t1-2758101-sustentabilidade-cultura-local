@@ -17,7 +17,7 @@ class _HomeAlunoState extends State<HomeAluno> {
   List<Map<String, dynamic>> _professores = [];
   List<Map<String, dynamic>> _filteredProfessores = [];
   String? _selectedMateria;
-  double _precoMaximo = 100; // Defina o valor máximo desejado para o preço
+  double _precoMaximo = 100;
 
   @override
   void initState() {
@@ -39,7 +39,15 @@ class _HomeAlunoState extends State<HomeAluno> {
       var db = FirebaseFirestore.instance;
       var snapshot = await db.collection("Instrutor").get();
       setState(() {
-        _professores = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+        _professores = snapshot.docs.map((doc) {
+          var data = doc.data() as Map<String, dynamic>;
+          return {
+            'nome': data['nome'] ?? 'Nome não disponível',
+            'materia': data['materia'] ?? 'Matéria não especificada',
+            'precoHora': data['precoHora'] ?? 0,
+            'email': data['email'] ?? '',
+          };
+        }).toList();
         _filteredProfessores = List.from(_professores);
       });
     } catch (e) {
@@ -51,8 +59,8 @@ class _HomeAlunoState extends State<HomeAluno> {
     String searchQuery = _searchController.text.toLowerCase();
     setState(() {
       _filteredProfessores = _professores.where((professor) {
-        final nome = professor['nome'].toLowerCase();
-        final materia = professor['materia']?.toLowerCase() ?? '';
+        final nome = (professor['nome'] ?? '').toLowerCase();
+        final materia = (professor['materia'] ?? '').toLowerCase();
         final preco = double.tryParse(professor['precoHora'].toString()) ?? 0;
 
         bool matchesSearchQuery = searchQuery.isEmpty || nome.contains(searchQuery);
@@ -66,106 +74,141 @@ class _HomeAlunoState extends State<HomeAluno> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home do Aluno'),
-        backgroundColor: Colors.black,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Autocomplete<String>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                if (textEditingValue.text.isEmpty) {
-                  return const Iterable<String>.empty();
-                }
-                return _professores
-                    .map((prof) => prof['nome'].toString())
-                    .where((nome) => nome.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-              },
-              onSelected: (String selection) {
-                _searchController.text = selection;
-                _filterProfessores();
-              },
-              fieldViewBuilder: (BuildContext context, TextEditingController fieldTextEditingController,
-                  FocusNode fieldFocusNode, VoidCallback onFieldSubmitted) {
-                _searchController.text = fieldTextEditingController.text;
-                return TextField(
-                  controller: fieldTextEditingController,
-                  focusNode: fieldFocusNode,
-                  decoration: const InputDecoration(
-                    labelText: 'Buscar Professores',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                  onChanged: (value) {
+    return SafeArea(
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFEDE7F6), Color(0xFFD1C4E9)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                // Campo de busca com autocomplete estilizado
+                Autocomplete<String>(
+                  optionsBuilder: (TextEditingValue textEditingValue) {
+                    if (textEditingValue.text.isEmpty) {
+                      return const Iterable<String>.empty();
+                    }
+                    return _professores
+                        .map((prof) => prof['nome'].toString())
+                        .where((nome) => nome.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                  },
+                  onSelected: (String selection) {
+                    _searchController.text = selection;
                     _filterProfessores();
                   },
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              value: _selectedMateria,
-              items: ['Matemática', 'Inglês', 'Português', 'Violão'].map((materia) {
-                return DropdownMenuItem<String>(
-                  value: materia,
-                  child: Text(materia),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedMateria = newValue;
-                  _filterProfessores();
-                });
-              },
-              decoration: const InputDecoration(
-                labelText: 'Filtrar por Matéria',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Column(
-              children: [
-                Text("Filtrar por faixa de preço"),
-                Slider(
-                  value: _precoMaximo,
-                  min: 0,
-                  max: 500,
-                  divisions: 50,
-                  label: 'R\$ ${_precoMaximo.toStringAsFixed(0)}',
-                  onChanged: (value) {
+                  fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
+                    _searchController.text = fieldTextEditingController.text;
+                    return TextField(
+                      controller: fieldTextEditingController,
+                      focusNode: fieldFocusNode,
+                      decoration: InputDecoration(
+                        labelText: 'Buscar Professores',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        prefixIcon: Icon(Icons.search, color: Colors.deepPurple),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                      onChanged: (value) {
+                        _filterProfessores();
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                // Filtro de Matéria com Dropdown
+                DropdownButtonFormField<String>(
+                  value: _selectedMateria,
+                  items: ['Matemática', 'Inglês', 'Português', 'Violão'].map((materia) {
+                    return DropdownMenuItem<String>(
+                      value: materia,
+                      child: Text(materia),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
                     setState(() {
-                      _precoMaximo = value;
+                      _selectedMateria = newValue;
                       _filterProfessores();
                     });
                   },
+                  decoration: InputDecoration(
+                    labelText: 'Filtrar por Matéria',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Filtro de faixa de preço com Slider estilizado
+                Column(
+                  children: [
+                    Text(
+                      "Filtrar por faixa de preço",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.deepPurple),
+                    ),
+                    Slider(
+                      value: _precoMaximo,
+                      min: 0,
+                      max: 500,
+                      divisions: 50,
+                      label: 'R\$ ${_precoMaximo.toStringAsFixed(0)}',
+                      onChanged: (value) {
+                        setState(() {
+                          _precoMaximo = value;
+                          _filterProfessores();
+                        });
+                      },
+                      activeColor: Colors.deepPurple,
+                      inactiveColor: Colors.deepPurple.shade100,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Lista de professores com Cards personalizados
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _filteredProfessores.length,
+                    itemBuilder: (context, index) {
+                      final professor = _filteredProfessores[index];
+                      return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        elevation: 4,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          title: Text(
+                            professor['nome'],
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                          ),
+                          subtitle: Text(
+                            'Matéria: ${professor['materia']}\nPreço por hora: R\$ ${professor['precoHora']}',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                          trailing: Icon(Icons.arrow_forward, color: Colors.deepPurple),
+                          onTap: () {
+                            perfilInstrutor(professor['email']);
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _filteredProfessores.length,
-                itemBuilder: (context, index) {
-                  final professor = _filteredProfessores[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      title: Text(professor['nome']),
-                      subtitle: Text('Matéria: ${professor['materia']}\nPreço por hora: R\$ ${professor['precoHora']}'),
-                      trailing: const Icon(Icons.arrow_forward),
-                      onTap: () {
-                        perfilInstrutor(professor['email']);
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
