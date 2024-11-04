@@ -1,6 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 class EditarHorariosScreen extends StatefulWidget {
   final String instructorEmail;
@@ -21,6 +23,9 @@ class _EditarHorariosScreenState extends State<EditarHorariosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Editar Horários"),
+      ),
       body: Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -98,8 +103,8 @@ class _EditarHorariosScreenState extends State<EditarHorariosScreen> {
                   SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: _addHorario,
-                    icon: Icon(Icons.add, color: const Color.fromARGB(255, 255, 255, 255)),
-                    label: Text('Adicionar Horário',style: TextStyle(color: Colors.white),),
+                    icon: Icon(Icons.add, color: Colors.white),
+                    label: Text('Adicionar Horário', style: TextStyle(color: Colors.white)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color.fromARGB(255, 91, 223, 73),
                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
@@ -185,21 +190,22 @@ class _EditarHorariosScreenState extends State<EditarHorariosScreen> {
     });
   }
 
-  void _salvarHorarios() async {
-    var db = FirebaseFirestore.instance;
-    Map<String, List<Map<String, dynamic>>> formattedHorarios = {};
-    
-    // Convertendo DateTime para String para salvar no Firestore
-    _horarios.forEach((date, horarios) {
-      String formattedDate = "${date.year}-${date.month}-${date.day}";
-      formattedHorarios[formattedDate] = horarios;
-    });
-    
-    await db
-        .collection("Instrutor")
-        .doc(widget.instructorEmail)
-        .update({'horarios': formattedHorarios});
-    
-    Navigator.pop(context);
-  }
+void _salvarHorarios() async {
+  var db = FirebaseFirestore.instance;
+  Map<String, List<Map<String, dynamic>>> formattedHorarios = {};
+  
+  _horarios.forEach((date, horarios) {
+    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+    formattedHorarios[formattedDate] = horarios;
+  });
+
+  await db
+      .collection("Instrutor")
+      .doc(widget.instructorEmail)
+      .set({'horarios': formattedHorarios}, SetOptions(merge: true));
+
+  Navigator.pop(context);
+}
+
+
 }

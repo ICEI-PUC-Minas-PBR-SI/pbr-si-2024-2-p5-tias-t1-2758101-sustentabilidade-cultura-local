@@ -27,41 +27,44 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _loadHorariosDisponiveis(_selectedDay);
   }
 
-  Future<void> _loadHorariosDisponiveis(DateTime selectedDay) async {
-    // Limpa horários e redefine o horário selecionado
-    setState(() {
-      horariosDisponiveis = [];
-      _selectedHorario = null;
-    });
+ Future<void> _loadHorariosDisponiveis(DateTime selectedDay) async {
+  setState(() {
+    horariosDisponiveis = [];
+    _selectedHorario = null;
+  });
 
-    // Obtenha os horários salvos do instrutor para o dia selecionado
-    final docRef = FirebaseFirestore.instance
-        .collection('Instrutor')
-        .doc(widget.instructorEmail);
+  final docRef = FirebaseFirestore.instance
+      .collection('Instrutor')
+      .doc(widget.instructorEmail);
 
-    final snapshot = await docRef.get();
+  final snapshot = await docRef.get();
 
-    if (snapshot.exists && snapshot.data()!['horarios'] != null) {
-      final horariosDoDia = snapshot.data()!['horarios'][DateFormat('yyyy-MM-dd').format(selectedDay)];
-      
-      if (horariosDoDia != null) {
-        setState(() {
-          horariosDisponiveis = List<String>.from(
-              horariosDoDia.map((horario) => '${horario['inicio']} - ${horario['termino']}'));
-        });
-      }
+  if (snapshot.exists && snapshot.data()!['horarios'] != null) {
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDay);
+    final horariosDoDia = snapshot.data()!['horarios'][formattedDate];
+
+    if (horariosDoDia != null) {
+      setState(() {
+        horariosDisponiveis = List<String>.from(
+            horariosDoDia.map((horario) => '${horario['inicio']} - ${horario['termino']}'));
+      });
+    } else {
+      print("Nenhum horário encontrado para a data selecionada.");
     }
-
-    // Obtenha os horários reservados
-    await getHorariosReservados(selectedDay, widget.instructorEmail);
+  } else {
+    print("Documento do instrutor ou campo de horários não encontrado.");
   }
+
+  await getHorariosReservados(selectedDay, widget.instructorEmail);
+}
+
 
   Future<void> getHorariosReservados(DateTime data, String instructorEmail) async {
     final docRef = FirebaseFirestore.instance
-        .collection('AgendaAulas') // Coleção de instrutores
-        .doc(instructorEmail) // Documento específico do instrutor
-        .collection('aulas') // Subcoleção para as aulas desse instrutor
-        .doc(DateFormat('yyyy-MM-dd').format(data)); // Documento específico para a data
+        .collection('AgendaAulas')
+        .doc(instructorEmail)
+        .collection('aulas')
+        .doc(DateFormat('yyyy-MM-dd').format(data));
 
     final snapshot = await docRef.get();
 
@@ -70,21 +73,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
         horariosReservados = List<String>.from(snapshot['horariosReservados']);
       });
     } else {
-      horariosReservados = [];
+      setState(() {
+        horariosReservados = [];
+      });
+      print("Nenhum horário reservado encontrado para a data.");
     }
   }
 
   Future<void> reservarAula(DateTime data, String horario, String alunoId) async {
     final docRef = FirebaseFirestore.instance
-        .collection('AgendaAulas') // Coleção de instrutores
-        .doc(widget.instructorEmail) // Documento específico do instrutor
-        .collection('aulas') // Subcoleção para as aulas desse instrutor
-        .doc(DateFormat('yyyy-MM-dd').format(data)); // Documento específico para a data
+        .collection('AgendaAulas')
+        .doc(widget.instructorEmail)
+        .collection('aulas')
+        .doc(DateFormat('yyyy-MM-dd').format(data));
 
     await docRef.set({
       'horariosReservados': FieldValue.arrayUnion([horario]),
       'alunoId': alunoId,
-    }, SetOptions(merge: true)); // Usa `merge` para atualizar o documento existente
+    }, SetOptions(merge: true));
   }
 
   @override
@@ -104,97 +110,85 @@ class _CalendarScreenState extends State<CalendarScreen> {
               setState(() {
                 _selectedDay = selectedDay;
                 _focusedDay = focusedDay;
-                _selectedHorario =
-                    null; // Limpa a seleção de horário ao mudar o dia
+                _selectedHorario = null;
               });
-              _loadHorariosDisponiveis(
-                  selectedDay); // Carrega horários disponíveis
+              _loadHorariosDisponiveis(selectedDay);
             },
           ),
           const SizedBox(height: 16.0),
           Expanded(
-            child: ListView.builder(
-              itemCount: horariosDisponiveis.length,
-              itemBuilder: (context, index) {
-                final horario = horariosDisponiveis[index];
-                final isReservado = horariosReservados.contains(horario);
-                return ListTile(
-                  title: Text(
-                    horario,
-                    style: TextStyle(
-                      color: isReservado
-                          ? Colors.red
-                          : Colors.black, // Muda a cor se reservado
-                    ),
+            child: horariosDisponiveis.isEmpty
+                ? Center(child: Text("Nenhum horário disponível para a data selecionada."))
+                : ListView.builder(
+                    itemCount: horariosDisponiveis.length,
+                    itemBuilder: (context, index) {
+                      final horario = horariosDisponiveis[index];
+                      final isReservado = horariosReservados.contains(horario);
+                      return ListTile(
+                        title: Text(
+                          horario,
+                          style: TextStyle(
+                            color: isReservado ? Colors.red : Colors.black,
+                          ),
+                        ),
+                        enabled: !isReservado,
+                        onTap: isReservado
+                            ? null
+                            : () {
+                                setState(() {
+                                  _selectedHorario = horario;
+                                });
+                              },
+                      );
+                    },
                   ),
-                  enabled: !isReservado, // Desabilita se já reservado
-                  onTap: isReservado
-                      ? null // Não permite interação se reservado
-                      : () {
-                          setState(() {
-                            _selectedHorario =
-                                horario; // Armazena o horário selecionado
-                          });
-                        },
-                );
-              },
-            ),
           ),
-          if (_selectedHorario != null &&
-              !horariosReservados.contains(_selectedHorario))
+          if (_selectedHorario != null && !horariosReservados.contains(_selectedHorario))
             Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    // Exibir um indicador de progresso enquanto a reserva está em andamento
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return Center(child: CircularProgressIndicator());
-                      },
-                    );
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return Center(child: CircularProgressIndicator());
+                    },
+                  );
 
-                    await reservarAula(
-                        _selectedDay, _selectedHorario!, alunoId);
+                  await reservarAula(_selectedDay, _selectedHorario!, alunoId);
 
-                    // Fechar o indicador de progresso após a reserva
-                    Navigator.pop(context);
+                  Navigator.pop(context);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content:
-                              Text('Horário $_selectedHorario reservado!')),
-                    );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Horário $_selectedHorario reservado!')),
+                  );
 
-                    _loadHorariosDisponiveis(
-                        _selectedDay); // Atualiza horários após a reserva
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.green,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                  _loadHorariosDisponiveis(_selectedDay);
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  elevation: 8,
+                  shadowColor: Colors.grey.withOpacity(0.5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check, size: 24, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'Confirmar Reserva',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    elevation: 8, // Adiciona uma sombra mais pronunciada
-                    shadowColor: Colors.grey.withOpacity(0.5), // Cor da sombra
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.check,
-                          size: 24,
-                          color: Colors.white), // Ícone de confirmação
-                      SizedBox(width: 8),
-                      Text(
-                        'Confirmar Reserva',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                )),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
