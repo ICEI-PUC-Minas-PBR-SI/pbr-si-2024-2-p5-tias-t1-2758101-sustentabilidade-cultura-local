@@ -58,7 +58,7 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
+              colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 43, 83, 116)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
