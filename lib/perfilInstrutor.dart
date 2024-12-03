@@ -58,7 +58,7 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 43, 83, 116)],
+               colors: [Color.fromARGB(255, 241, 241, 241), Color.fromARGB(255, 5, 79, 139)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -70,7 +70,8 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
               children: <Widget>[
                 Center(
                   child: CircleAvatar(
-                    radius: 50,
+                    radius: 70,
+                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
                     backgroundImage: NetworkImage(
                         "URL_DA_IMAGEM"), // Substitua pela URL da imagem do professor
                   ),
@@ -84,7 +85,7 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
                     style: const TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF6200EE),
+                      color: Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
                 ),
@@ -96,7 +97,7 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
                         : 'Carregando...',
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.grey[700],
+                      color: const Color.fromARGB(226, 8, 8, 8),
                     ),
                   ),
                 ),
@@ -106,19 +107,19 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
                     'Preço por hora: R\$ ${recoveredData.isNotEmpty ? recoveredData.values.first['precoHora'] : 'Carregando...'}',
                     style: const TextStyle(
                       fontSize: 18,
-                      color: Color.fromARGB(255, 44, 141, 40),
+                      color: Color.fromARGB(255, 10, 105, 7),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Divider(color: Colors.grey),
+                const Divider(color: Color.fromARGB(255, 248, 247, 247)),
                 const SizedBox(height: 20),
                 const Text(
                   'Sobre mim',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF6200EE),
+                    color: Color.fromARGB(255, 248, 248, 248),
                   ),
                 ),
                 const SizedBox(height: 10),

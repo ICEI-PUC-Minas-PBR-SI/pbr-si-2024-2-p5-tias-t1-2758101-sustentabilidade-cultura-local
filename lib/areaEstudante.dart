@@ -19,7 +19,7 @@ class StudentHomeScreen extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4A148C), Color(0xFF880E4F)],
+            colors: [Color.fromARGB(255, 32, 31, 32), Color(0xFF880E4F)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

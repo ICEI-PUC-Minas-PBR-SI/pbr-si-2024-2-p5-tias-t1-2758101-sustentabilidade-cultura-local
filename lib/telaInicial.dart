@@ -33,7 +33,7 @@ class _AccessTypeScreenState extends State<AccessTypeScreen> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4A148C), Color(0xFF880E4F)],
+            colors: [Color.fromARGB(255, 32, 6, 65), Color.fromARGB(255, 194, 11, 108)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

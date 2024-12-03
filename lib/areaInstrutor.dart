@@ -22,7 +22,7 @@ class InstructorHomeScreen extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+            colors: [Color.fromARGB(255, 8, 8, 8), Color(0xFF42A5F5)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
