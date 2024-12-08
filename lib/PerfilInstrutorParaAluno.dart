@@ -66,7 +66,7 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePageStudent> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+        backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
