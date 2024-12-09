@@ -194,6 +194,7 @@ void _salvarHorarios() async {
   var db = FirebaseFirestore.instance;
   Map<String, List<Map<String, dynamic>>> formattedHorarios = {};
   
+  // Formata os horários para o formato adequado antes de salvar
   _horarios.forEach((date, horarios) {
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);
     formattedHorarios[formattedDate] = horarios;
@@ -206,6 +207,7 @@ void _salvarHorarios() async {
 
   Navigator.pop(context);
 }
+
 
 
 }

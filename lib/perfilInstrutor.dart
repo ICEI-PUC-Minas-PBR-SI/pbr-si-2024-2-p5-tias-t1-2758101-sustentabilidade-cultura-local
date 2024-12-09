@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:tis_sustentabilidade/editar_horarios.dart';
+import 'editar_horarios.dart';
 
 class ProfessorProfilePage extends StatefulWidget {
   final String email;
@@ -58,7 +58,7 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-               colors: [Color.fromARGB(255, 241, 241, 241), Color.fromARGB(255, 5, 79, 139)],
+              colors: [Color(0xFFE3F2FD), Color(0xFF1E88E5)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -66,60 +66,63 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Center(
                   child: CircleAvatar(
                     radius: 70,
-                    backgroundColor: Color.fromARGB(255, 255, 255, 255),
+                    backgroundColor: Colors.white,
                     backgroundImage: NetworkImage(
-                        "URL_DA_IMAGEM"), // Substitua pela URL da imagem do professor
+                      recoveredData.isNotEmpty
+                          ? recoveredData.values.first['imagem'] ?? "URL_DA_IMAGEM"
+                          : "URL_DA_IMAGEM",
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Center(
-                  child: Text(
-                    recoveredData.isNotEmpty
-                        ? recoveredData.values.first['nome']
-                        : 'Carregando...',
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
+                const SizedBox(height: 20),
+                Text(
+                  recoveredData.isNotEmpty
+                      ? recoveredData.values.first['nome']
+                      : 'Carregando...',
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 8),
-                Center(
+                Text(
+                  recoveredData.isNotEmpty
+                      ? recoveredData.values.first['materia']
+                      : 'Carregando...',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Preço por hora: R\$ ${recoveredData.isNotEmpty ? recoveredData.values.first['precoHora'] : 'Carregando...'}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: const Color(0xFF43A047),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  height: 40,
+                  thickness: 1,
+                ),
+                const Align(
+                  alignment: Alignment.centerLeft,
                   child: Text(
-                    recoveredData.isNotEmpty
-                        ? recoveredData.values.first['materia']
-                        : 'Carregando...',
+                    'Sobre Mim',
                     style: TextStyle(
-                      fontSize: 18,
-                      color: const Color.fromARGB(226, 8, 8, 8),
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Center(
-                  child: Text(
-                    'Preço por hora: R\$ ${recoveredData.isNotEmpty ? recoveredData.values.first['precoHora'] : 'Carregando...'}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      color: Color.fromARGB(255, 10, 105, 7),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Divider(color: Color.fromARGB(255, 248, 247, 247)),
-                const SizedBox(height: 20),
-                const Text(
-                  'Sobre mim',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 248, 248, 248),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -127,7 +130,11 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
                   recoveredData.isNotEmpty
                       ? recoveredData.values.first['biografia']
                       : 'Carregando...',
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    height: 1.5,
+                  ),
                   textAlign: TextAlign.justify,
                 ),
                 const Spacer(),
@@ -135,11 +142,12 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
                   child: ElevatedButton(
                     onPressed: editHorarios,
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+                      padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
                       backgroundColor: const Color(0xFF43A047),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
+                      elevation: 5,
                     ),
                     child: const Text(
                       'Editar Agenda',
@@ -151,6 +159,7 @@ class _ProfessorProfilePageState extends State<ProfessorProfilePage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

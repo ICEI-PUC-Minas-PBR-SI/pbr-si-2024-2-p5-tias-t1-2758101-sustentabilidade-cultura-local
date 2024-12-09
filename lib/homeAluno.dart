@@ -79,7 +79,7 @@ class _HomeAlunoState extends State<HomeAluno> {
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFFEDE7F6), Color(0xFFD1C4E9)],
+              colors: [Color(0xFF4A148C), Color(0xFF880E4F)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -89,43 +89,24 @@ class _HomeAlunoState extends State<HomeAluno> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                // Campo de busca com autocomplete estilizado
-                Autocomplete<String>(
-                  optionsBuilder: (TextEditingValue textEditingValue) {
-                    if (textEditingValue.text.isEmpty) {
-                      return const Iterable<String>.empty();
-                    }
-                    return _professores
-                        .map((prof) => prof['nome'].toString())
-                        .where((nome) => nome.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-                  },
-                  onSelected: (String selection) {
-                    _searchController.text = selection;
+                // Campo de busca estilizado com fundo branco
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    labelText: 'Buscar Professores',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[700]),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  onChanged: (value) {
                     _filterProfessores();
-                  },
-                  fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
-                    _searchController.text = fieldTextEditingController.text;
-                    return TextField(
-                      controller: fieldTextEditingController,
-                      focusNode: fieldFocusNode,
-                      decoration: InputDecoration(
-                        labelText: 'Buscar Professores',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide.none,
-                        ),
-                        prefixIcon: Icon(Icons.search, color: Colors.deepPurple),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      onChanged: (value) {
-                        _filterProfessores();
-                      },
-                    );
                   },
                 ),
                 const SizedBox(height: 20),
-                // Filtro de Matéria com Dropdown
+                // Filtro de Matéria com Dropdown estilizado
                 DropdownButtonFormField<String>(
                   value: _selectedMateria,
                   items: ['Matemática', 'Inglês', 'Português', 'Violão'].map((materia) {
@@ -152,10 +133,11 @@ class _HomeAlunoState extends State<HomeAluno> {
                 const SizedBox(height: 20),
                 // Filtro de faixa de preço com Slider estilizado
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "Filtrar por faixa de preço",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.deepPurple),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
                     ),
                     Slider(
                       value: _precoMaximo,
@@ -169,8 +151,8 @@ class _HomeAlunoState extends State<HomeAluno> {
                           _filterProfessores();
                         });
                       },
-                      activeColor: Colors.deepPurple,
-                      inactiveColor: Colors.deepPurple.shade100,
+                      activeColor: Colors.white,
+                      inactiveColor: Colors.white54,
                     ),
                   ],
                 ),
@@ -185,19 +167,20 @@ class _HomeAlunoState extends State<HomeAluno> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
+                        color: Colors.white,
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         elevation: 4,
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           title: Text(
                             professor['nome'],
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A148C)),
                           ),
                           subtitle: Text(
                             'Matéria: ${professor['materia']}\nPreço por hora: R\$ ${professor['precoHora']}',
                             style: TextStyle(color: Colors.grey[700]),
                           ),
-                          trailing: Icon(Icons.arrow_forward, color: Colors.deepPurple),
+                          trailing: Icon(Icons.arrow_forward, color: Color(0xFF4A148C)),
                           onTap: () {
                             perfilInstrutor(professor['email']);
                           },
